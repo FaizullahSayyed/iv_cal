@@ -6,13 +6,19 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-
-// Configure CORS for production
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+app.use(cors({
+  origin: [
+    "http://31.97.227.6:3000",
+    "http://31.97.227.6"
+  ],
   credentials: true
-};
-app.use(cors(corsOptions));
+}));
+// Configure CORS for production
+// const corsOptions = {
+//   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+//   credentials: true
+// };
+// app.use(cors(corsOptions));
 app.use(express.json());
 
 async function initDb() {

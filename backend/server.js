@@ -4,7 +4,7 @@ const pool = require('./dbcon');
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.BACKEND_ORT || 3001;
+const PORT = process.env.BACKEND_PORT || 3001;
 
 console.log("PORT", process.env.BACKEND_PORT);
 

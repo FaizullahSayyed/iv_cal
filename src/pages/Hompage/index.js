@@ -26,8 +26,6 @@ const Homepage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
-    console.log(username, password);
     
     try {
       const response = await axios.post(`${API_BASE_URL}/api/login`, { username, password });

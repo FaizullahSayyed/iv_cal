@@ -4,7 +4,7 @@ const pool = require('./dbcon');
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.BACKENDPORT || 3001;
 
 app.use(cors({
   origin: [

@@ -90,7 +90,7 @@ async function initDb() {
     `);
     console.log('Database tables ready');
   } catch (err) {
-    console.error('Error creating tables:', err);
+    console.error('Error creating taSbles:', err);
   }
 }
 initDb();
@@ -203,6 +203,23 @@ app.get('/api/iv-items', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching IV items:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.post('/api/iv-items', async (req, res) => {
+  const { name, price_inr } = req.body || {};
+  if (!name || !price_inr) {
+    return res.status(400).json({ error: 'Name and price are required' });
+  }
+  try {
+    const result = await pool.query(
+      'INSERT INTO iv_items (name, price_inr) VALUES ($1, $2) RETURNING *',
+      [name, parseFloat(price_inr)]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error adding IV item:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

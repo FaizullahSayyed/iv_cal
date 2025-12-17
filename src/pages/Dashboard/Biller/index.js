@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaFileInvoiceDollar, FaTrash, FaSignOutAlt } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaTrash, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 import API_BASE_URL from '../../../config/api';
 
 const BillerDashboard = () => {
@@ -9,6 +9,10 @@ const BillerDashboard = () => {
   const [error, setError] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientDetails, setPatientDetails] = useState(null);
+  const [showAddIVItem, setShowAddIVItem] = useState(false);
+  const [ivItemName, setIvItemName] = useState('');
+  const [ivItemPrice, setIvItemPrice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -72,6 +76,37 @@ const BillerDashboard = () => {
     }
   };
 
+  const handleAddIVItem = async (e) => {
+    e.preventDefault();
+    if (!ivItemName.trim() || !ivItemPrice.trim()) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await axios.post(`${API_BASE_URL}/api/iv-items`, {
+        name: ivItemName.trim(),
+        price_inr: parseFloat(ivItemPrice)
+      });
+      alert('IV Item added successfully!');
+      setShowAddIVItem(false);
+      setIvItemName('');
+      setIvItemPrice('');
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.error || 'Failed to add IV item');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const closeAddIVItemModal = () => {
+    setShowAddIVItem(false);
+    setIvItemName('');
+    setIvItemPrice('');
+  };
+
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading billing data...</div>;
   if (error) return <div style={{ padding: '40px', textAlign: 'center', color: '#c62828' }}>{error}</div>;
 
@@ -84,12 +119,33 @@ const BillerDashboard = () => {
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         marginBottom: '20px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
-          <FaFileInvoiceDollar size={32} color="#2e7d32" />
-          <div>
-            <h1 style={{ fontSize: 'clamp(20px, 5vw, 26px)', margin: 0, color: '#333' }}>Biller Dashboard</h1>
-            <p style={{ color: '#666', margin: '5px 0 0 0', fontSize: '14px' }}>Track patient IV charges</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <FaFileInvoiceDollar size={32} color="#2e7d32" />
+            <div>
+              <h1 style={{ fontSize: 'clamp(20px, 5vw, 26px)', margin: 0, color: '#333' }}>Biller Dashboard</h1>
+              <p style={{ color: '#666', margin: '5px 0 0 0', fontSize: '14px' }}>Track patient IV charges</p>
+            </div>
           </div>
+          <button
+            onClick={() => setShowAddIVItem(true)}
+            style={{
+              padding: '12px 20px',
+              backgroundColor: '#2e7d32',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              fontWeight: '600',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            <FaPlus size={14} /> Add IV Item
+          </button>
         </div>
       </div>
 
@@ -276,6 +332,140 @@ const BillerDashboard = () => {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {showAddIVItem && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '15px',
+          boxSizing: 'border-box',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '25px',
+            borderRadius: '12px',
+            width: '100%',
+            maxWidth: '450px',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
+          }}>
+            <h3 style={{ margin: '0 0 20px 0', color: '#333', fontSize: '20px' }}>
+              Add New IV Item
+            </h3>
+            
+            <form onSubmit={handleAddIVItem}>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '8px', 
+                  color: '#555', 
+                  fontWeight: '500',
+                  fontSize: '14px'
+                }}>
+                  IV Item Name
+                </label>
+                <input
+                  type="text"
+                  value={ivItemName}
+                  onChange={(e) => setIvItemName(e.target.value)}
+                  placeholder="e.g., Normal Saline, Ringer's Lactate"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '25px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '8px', 
+                  color: '#555', 
+                  fontWeight: '500',
+                  fontSize: '14px'
+                }}>
+                  Price (₹)
+                </label>
+                <input
+                  type="number"
+                  value={ivItemPrice}
+                  onChange={(e) => setIvItemPrice(e.target.value)}
+                  placeholder="Enter price in INR"
+                  required
+                  min="0"
+                  step="0.01"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={closeAddIVItemModal}
+                  disabled={submitting}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: '#9e9e9e',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    backgroundColor: submitting ? '#81c784' : '#2e7d32',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: submitting ? 'not-allowed' : 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  {submitting ? 'Adding...' : (
+                    <>
+                      <FaPlus size={12} /> Add Item
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

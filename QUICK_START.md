@@ -177,3 +177,4 @@ REACT_APP_API_URL=https://your-backend-domain.com
   - Railway: https://docs.railway.app
   - Hostinger: https://www.hostinger.com/tutorials
 
+

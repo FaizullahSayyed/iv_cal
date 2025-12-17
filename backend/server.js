@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors({
   origin: [
+    "http://localhost:3000",  // Add this for local development
     "http://31.97.227.6:3000",
     "http://31.97.227.6"
   ],

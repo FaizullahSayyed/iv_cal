@@ -1,7 +1,9 @@
+// Load environment variables first
+require("dotenv").config();
+
 const express = require('express');
 const cors = require('cors');
-const pool = require('./dbcon');
-require("dotenv").config();
+const pool = require('./src/dbcon');
 
 const app = express();
 const PORT = process.env.BACKEND_PORT || 3001;
